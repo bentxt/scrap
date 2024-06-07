@@ -1,0 +1,10 @@
+tell application "Google Chrome"
+    if it is running then
+        quit
+    else
+        activate
+        open location "http://xfinitytv.comcast.net"
+        delay 1
+        activate
+    end if
+end tell
