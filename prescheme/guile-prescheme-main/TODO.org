@@ -1,0 +1,239 @@
+#+TITLE: Where next for guile-prescheme?
+
+* TODO guile repl integration
+
+Currently the "prescheme" language definition is just scheme with a different
+default environment (aka. the "prelude", the stuff that's imported by default).
+
+In the Guile REPL you can =,L prescheme= to switch language, but it's not very
+useful because you stay in the guile-user module, which is Guile's default
+environment, not Pre-Scheme's!
+
+You can create a Pre-Scheme module and switch into it with some effort:
+
+#+BEGIN_SRC scheme
+(use-modules (system base language))
+(set-current-module (default-environment 'prescheme))
+,language prescheme
+#+END_SRC
+
+We need to make the process of "give me a Pre-Scheme REPL" easier.  Maybe just
+ship a REPL launcher script which starts up in Pre-Scheme instead of Guile?
+
+* TODO script to build each module
+
+We can use ~guile compile~ to get useful warnings:
+
+#+BEGIN_SRC shell
+find -name '*.scm' | xargs -n1 guild compile -W1 -O0 | grep -v '^wrote'
+#+END_SRC
+
+* STRT port ps-compiler
+
+Above is just the emulation layer.  The real work is the ps-compiler itself,
+which is written in Scheme 48 (and also Common Lisp apparently).  This will
+involve:
+
+ - rewrite s48 interfaces as guile modules
+ - rewrite macros from explicit renaming to syntax-case
+ - ... and many more unforeseen challenges...
+
+** ps-compiler/package-defs.scm [28/30]
+*** [X] node
+*** [X] variable
+*** [X] primop
+*** [X] pp-cps
+*** [X] let-nodes
+*** [X] check-nodes
+*** [X] parameters
+*** [X] set-parameters
+*** [X] arch
+*** [X] node-vector
+*** [X] front
+*** [X] front-debug
+*** [X] cps-util
+*** [X] jump
+*** [X] simplify
+*** [-] simplify-internal
+*** [X] simplify-let
+*** [X] simplify-join
+*** [X] simp-patterns
+*** [X] remove-cells
+*** [X] flow-values
+*** [X] comp-util
+*** [X] expanding-vectors
+*** [X] transitive
+*** [X] integer-sets
+*** [X] strongly-connected
+*** [X] dominators
+*** [X] ssa
+*** [X] compiler-byte-vectors
+*** [?] annotated-read
+ - the implementation of this package is missing from s48
+
+** ps-compiler/prescheme/package-defs.scm [22/27]
+*** [X] prescheme-compiler
+*** [-] prescheme-display
+*** [X] protocol
+*** [-] prescheme-front-end
+*** [X] forms
+*** [X] expand
+*** [X] ps-primitives
+*** [-] primitive-data
+*** [X] eval-node
+*** [X] flatten
+*** [X] flatten-internal
+*** [X] to-cps
+*** [-] linking
+*** [X] ps-types
+*** [X] type-variables
+*** [X] record-types
+*** [-] expand-define-record-type
+*** [X] inference
+*** [X] inference-internal
+*** [X] node-types
+*** [X] ps-primops
+*** [X] ps-c-primops
+*** [X] primop-data
+*** [X] c-primop-data
+*** [X] external-values
+*** [X] c
+*** [X] c-internal
+
+** DONE port scheme/bcomp/node.scm
+** DONE port scheme/bcomp/schemify.scm
+** DONE port scheme/bcomp/package.scm
+** TODO port write-one-line from scheme/big/more-port.scm
+
+** TODO port the scheme48 reader & expander
+*** [-] prescheme/bcomp/read-form.scm
+*** [X] ps-compiler/prescheme/expand.scm
+*** [X] ps-compiler/prescheme/flatten.scm
+*** [X] ps-compiler/prescheme/front-end.scm
+*** [-] ps-compiler/prescheme/linking.scm
+
+** TODO port the primitive-data package
+*** [ ] ps-compiler/prescheme/primop/scm-scheme.scm
+*** [ ] ps-compiler/prescheme/primop/scm-arith.scm
+*** [ ] ps-compiler/prescheme/primop/scm-memory.scm
+*** [ ] ps-compiler/prescheme/primop/scm-record.scm
+
+** TODO review bcomp node vs. ps-compiler node usage
+
+Scheme48 has two different "node" implementations; one is part of the
+byte-compiler (bcomp) and one is part of the prescheme compiler (ps-compiler).
+To compile prescheme code, it is first run through the Scheme48 expander,
+producing bcomp nodes which are then converted to ps-compiler nodes.
+
+The trouble is that both types of record are called "node", and a number of
+utility functions share the same name.  These differences are handled in the
+Scheme48 package definitions, but it's possible I've made some errors during
+porting.
+
+Carefuly review package definitions referencing "nodes" vs "node" interfaces.
+
+* TODO prepare some compatibility tests
+
+We need to find collect all the "real-world" Pre-Scheme we can get our hands on,
+and test that our Guile Pre-Scheme produces identical output to Scheme 48
+Pre-Scheme.
+
+Exhibit A is the "hello world" from the manual:
+
+#+BEGIN_SRC scheme
+;; https://thintz.com/resources/prescheme-documentation#Example-Pre_002dScheme-compiler-usage
+(define (main argc argv)
+  (if (= argc 2)
+      (let ((out (current-output-port)))
+        (write-string "Hello, world, " out)
+        (write-string (vector-ref argv 1) out)
+        (write-char #\! out)
+        (newline out)
+        0)
+      (let ((out (current-error-port)))
+        (write-string "Usage: " out)
+        (write-string (vector-ref argv 0) out)
+        (write-string " <user>" out)
+        (newline out)
+        (write-string "  Greets the world & <user>." out)
+        (newline out)
+        -1)))
+#+END_SRC
+
+A bunch of tests are included in scheme48-1.9.2/ps-compiler/prescheme/test.
+Nice!
+
+** TODO test infrastucture (SRFI-64?)
+** TODO test coverage of let-nodes
+
+* TODO replace s48 utilities with rnrs/srfi where possible
+
+The initial port of ps-compiler tries to minimise changes from the original
+source, this has meant porting a decent collection of supporting utility
+functions and macros from Scheme 48.  After the initial port is complete, we
+should replace these utilities with standardised equivalents.
+
+This will reduce the amount of code we need to maintain, make it easier for
+people with experience in other contemporary scheme projects to contribute, and
+ease future work to port ps-compiler to other scheme implementations.
+
+* IDEA replace the s48 expander to support modern standard scheme
+
+Pre-Scheme relies on the Scheme 48 macro expander to pre-process source code
+before translating it into the intermediate representation used by the compiler.
+
+John Cowan has suggested replacing the Scheme 48 expander with Unsyntax
+(https://www.unsyntax.org/).  Unsyntax supports R7RS with a number of extensions
+(including a variety of macro systems), expanding to a minimal dialect of
+R7RS-small.  It's also implemented in R7RS-small, so is easily portable across
+scheme implementations.
+
+To integrate the new expander, additional work will be required to resolve
+mismatches between Unsyntax's minimal dialect and Pre-Scheme's minimal dialect.
+
+This would significantly reduce the amount of code we need to maintain, go a
+long way towards modernising the Pre-Scheme language, and ease future work to
+port ps-compiler to other scheme implementations.
+
+This would also probably be a backwards-incompatible change to Pre-Scheme, going
+beyond the scope implied by calling this project a "port".  We should discuss
+this with Richard Kelsey, Jonathan Rees, and Michael Sperber and get their
+permission to continue under the Pre-Scheme name, or possibly rename the
+project.
+
+* IDEA provide an optional Pre-Scheme "standard library"
+
+Pre-Scheme supports a very minimal dialect of scheme, which is basically the
+subset of scheme features that can be directly translated to C.  This excludes
+many features that a scheme programmer would expect, such as lists.
+
+This minimalism is necessary to satisfy Pre-Scheme's goal of offering a
+low-level, zero-overhead, zero-runtime scheme-like language, and that purity
+shouldn't be compromised.  It should always be possible to write in a minimal
+dialect that compiles directly to standard portable C.
+
+However, to make Pre-Scheme more attractive and useful to a wider variety of
+programmers, we should provide a completely optional set of standard libraries,
+written in Pre-Scheme, to extend the base language with commonly-used
+functionality.  These libraries should offer APIs as close to standard scheme as
+possible (ie. based on RNRS/SRFI documents), but be implemented in a way that's
+familiar to C programmers, with unsurprising runtime characteristics.
+
+The libraries should cover things like:
+ - POSIX processes, threads, mutexes, shared memory, etc.
+ - lists
+ - hash-tables
+ - CLOS-alike
+ - ...?
+
+One challenge will be to decide how to support generic data-structures.  Will it
+be sufficient to offer a set of macros which expand into concrete definitions,
+like the C++ STL but in scheme?
+
+We should discuss this with Richard Kelsey, Jonathan Rees, and Michael Sperber
+to investigate whether there were any previous efforts in this direction.  We
+should also look at other scheme-likes and low-level lisps for inspiration on
+what functionality could be included, and consult with the wider scheme
+community to learn about as much prior art as possible.
+
+* TODO write more TODOs

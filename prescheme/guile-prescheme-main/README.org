@@ -1,0 +1,96 @@
+#+TITLE: Pre-Scheme for Guile
+
+This project is a work-in-progress port of the Pre-Scheme compiler from [[https://s48.org/][Scheme
+48]] to [[https://www.gnu.org/software/guile/][Guile]].  Pre-Scheme is a statically typed dialect of Scheme which offers
+the efficiency and low-level machine access of C while retaining many of the
+desirable features of Scheme.
+
+Read the Pre-Scheme manual [[https://thintz.com/resources/prescheme-documentation][here]].
+
+Read the Pre-Scheme paper [[https://dustycloud.org/tmp/prescheme.pdf][here]].
+
+* Where is it up to?
+
+An initial Pre-Scheme "emulation layer" has been implemented, which supports
+running Pre-Scheme code in a Guile Scheme interpreter.  This includes features
+like the ~define-enumeration~ and ~define-external-enumeration~ macros and a
+fake memory driver which supports ~allocate-memory~, ~deallocate-memory~.
+
+This is a *very* fresh port which still requires a good deal of testing and
+probably a few rounds of fixes before being considered "complete".
+
+Work continues on porting the Pre-Scheme to C compiler.
+
+* How can I play with it?
+
+** Running the Pre-Scheme emulator
+
+To play with the Pre-Scheme interpreter, you will need ~git~ and ~guile~.  Clone
+the repo and start a Guile REPL with ~guile-prescheme~ added to your load-path:
+
+#+BEGIN_SRC shell
+guix shell git guile
+git clone https://notabug.org/flatwhatson/guile-prescheme.git
+cd guile-prescheme
+guile -L .
+#+END_SRC
+
+In the Guile REPL, load the Pre-Scheme environment and switch to the Pre-Scheme
+language:
+
+#+BEGIN_SRC scheme
+(use-modules (system base language))
+(set-current-module (default-environment 'prescheme))
+,language prescheme
+#+END_SRC
+
+Your REPL is now emulating Pre-Scheme!
+
+** Hello, world, Pre-Scheme!
+
+Load up a Pre-Scheme REPL as above, then paste in the following program:
+
+#+BEGIN_SRC scheme
+(define (main argc argv)
+  (if (= argc 2)
+      (let ((out (current-output-port)))
+        (write-string "Hello, world, " out)
+        (write-string (vector-ref argv 1) out)
+        (write-char #\! out)
+        (newline out)
+        0)
+      (let ((out (current-error-port)))
+        (write-string "Usage: " out)
+        (write-string (vector-ref argv 0) out)
+        (write-string " <user>" out)
+        (newline out)
+        (write-string "  Greets the world & <user>." out)
+        (newline out)
+        -1)))
+#+END_SRC
+
+A Pre-Scheme ~main~ takes ARGC as an int and ARGV as a vector of strings.  As
+with a C program, the first argument is the name of the program which was run.
+
+To get the help output:
+
+#+BEGIN_SRC scheme
+> (main 1 #("./hello"))
+Usage: ./hello <user>
+  Greets the world & <user>.
+-1
+#+END_SRC
+
+To get the greeting:
+
+#+BEGIN_SRC scheme
+> (main 2 #("./hello" "Pre-Scheme"))
+Hello, world, Pre-Scheme!
+0
+#+END_SRC
+
+* How can I contribute?
+
+If you would like to learn more, co-ordinate with the developers, or simply hang
+out with like-minded Scheme folks, come and join the party in the #guile-steel
+channel on the LiberaChat IRC network.

@@ -1,0 +1,83 @@
+\input texinfo
+@c -*-texinfo-*-
+
+@c %**start of header
+@setfilename guile-prescheme.info
+@documentencoding UTF-8
+@settitle Guile Prescheme Reference Manual
+@c %**end of header
+
+@include version.texi
+
+@copying
+Copyright @copyright{} 2022 Andrew Whatson
+
+This manual includes material derived from works bearing the following
+notice:
+
+    Copyright © 1986-2001 Richard Kelsey and Jonathan Rees.
+    Copyright © 2001-2007 Michael Sperber and Martin Gasbichler.
+    Copyright © 2007-2012 Michael Sperber and Marcus Crestani.
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+    1. Redistributions of source code must retain the above copyright
+       notices, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notices, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. The name of the authors may not be used to endorse or promote products
+       derived from this software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+    OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+    IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+    NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@end copying
+
+@dircategory The Algorithmic Language Scheme
+@direntry
+* Guile Prescheme: (guile-prescheme).   
+@end direntry
+
+@titlepage
+@title The Guile Prescheme Manual
+@author Andrew Whatson
+
+@page
+@vskip 0pt plus 1filll
+Edition @value{EDITION} @*
+@value{UPDATED} @*
+
+@insertcopying
+@end titlepage
+
+@contents
+
+@c *********************************************************************
+@node Top
+@top Guile Prescheme
+
+This document describes Guile Prescheme version @value{VERSION}.
+
+@menu
+* Introduction::                Why Guile Prescheme?
+@end menu
+
+@c *********************************************************************
+@node Introduction
+@chapter Introduction
+
+INTRODUCTION HERE
+
+This documentation is a stub.
+
+@bye
