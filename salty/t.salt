@@ -1,0 +1,18 @@
+
+
+
+baba = 8888
+
+
+add :: int -> int -> int
+add a b := a + b
+
+
+add("jsdf","jsdf")
+
+
+_foo a b := a + b
+
+$gaga = \x -> echo(x)
+
+$gaga("hello")

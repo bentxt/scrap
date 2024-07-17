@@ -1,0 +1,6 @@
+[package]
+name        = "hello"
+description = "test"
+version     = "0.1.0"
+flix        = "0.48.0"
+authors     = ["John Doe <john@example.com>"]
