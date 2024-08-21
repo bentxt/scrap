@@ -10,6 +10,13 @@ bin/
 obj/
 out/
 
+**/.default-vscode
+**/.vscode
+**/*.pdf
+**/*.ttf
+**/*.png
+**/_Out
+
 
 **/*.o
 **/*.swp

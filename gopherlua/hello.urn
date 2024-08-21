@@ -1,0 +1,9 @@
+(defun display (x)
+    (print! x))
+
+
+(define haloa display)
+
+(define mytable { :gaga "gaaagaa" :gugu "guuuguuu"})
+
+(exported-vars) 
