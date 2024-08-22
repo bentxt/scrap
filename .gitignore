@@ -16,6 +16,8 @@ out/
 **/*.ttf
 **/*.png
 **/_Out
+**/_opam
+**/node_modules
 
 
 **/*.o
