@@ -6,6 +6,11 @@
 # Unignore all dirs
 !*/
 
+# ignore all dotfiles
+**/.*
+# Unignore all dirs
+!.gitignore
+
 bin/
 obj/
 out/
@@ -17,10 +22,17 @@ out/
 **/*.png
 **/_Out
 **/_opam
+**/_build
 **/node_modules
 
 
 **/*.o
+**/*.a
+**/*.cmi
+**/*.cmo
+**/*.cmx
+**/*.cmxa
+**/*.dylib
 **/*.swp
 **/*.jar
 **/*.exe
