@@ -28,6 +28,7 @@ out/
 **/node_modules
 
 
+**/*.out
 **/*.o
 **/*.a
 **/*.cmi

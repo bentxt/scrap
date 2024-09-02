@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean 
 
 all: main
 	./main
@@ -11,4 +11,5 @@ clean:
 	rm -f main
 	rm -f *.o
 	rm -f *.cm*
+	
 
