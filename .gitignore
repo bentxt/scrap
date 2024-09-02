@@ -10,7 +10,7 @@
 
 # ignore all dotfiles
 **/.*
-# Unignore all dirs
+# Unignore gitignore 
 !.gitignore
 
 bin/
@@ -27,7 +27,11 @@ out/
 **/_build
 **/node_modules
 
+# ignore release dirs like _20240830020641
+**/*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/
 
+
+**/*.html
 **/*.out
 **/*.o
 **/*.a
